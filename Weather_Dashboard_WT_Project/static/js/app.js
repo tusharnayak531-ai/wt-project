@@ -141,17 +141,17 @@ function renderHourly(h,currentTime){
   chart=new Chart(ctx,{
     type:"line",
     data:{labels,datasets:[
-      {label:"Temperature °C",data:temps,yAxisID:"y",tension:.38,borderWidth:2,pointRadius:1.5,fill:true,backgroundColor:"rgba(73,184,255,.08)"},
-      {label:"Rain %",data:rain,yAxisID:"y1",tension:.35,borderWidth:1.5,pointRadius:0}
+      {label:"Temperature °C",data:temps,yAxisID:"y",tension:.38,borderWidth:2,pointRadius:1.5,fill:true,backgroundColor:"rgba(255,138,91,.10)",borderColor:"#ff8a5b"},
+      {label:"Rain %",data:rain,yAxisID:"y1",tension:.35,borderWidth:1.5,pointRadius:0,borderColor:"#b18cff"}
     ]},
     options:{
       responsive:true,maintainAspectRatio:false,
       interaction:{mode:"index",intersect:false},
       plugins:{legend:{display:false}},
       scales:{
-        x:{grid:{display:false},ticks:{color:"#758aa0",maxTicksLimit:8}},
-        y:{position:"left",grid:{color:"rgba(255,255,255,.05)"},ticks:{color:"#758aa0",callback:v=>v+"°"}},
-        y1:{position:"right",min:0,max:100,grid:{display:false},ticks:{color:"#758aa0",callback:v=>v+"%"}}
+        x:{grid:{display:false},ticks:{color:"#a995b8",maxTicksLimit:8}},
+        y:{position:"left",grid:{color:"rgba(255,255,255,.05)"},ticks:{color:"#a995b8",callback:v=>v+"°"}},
+        y1:{position:"right",min:0,max:100,grid:{display:false},ticks:{color:"#a995b8",callback:v=>v+"%"}}
       }
     }
   });
