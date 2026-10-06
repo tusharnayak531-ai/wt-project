@@ -4,40 +4,86 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Budget Tracker{% endblock %}</title>
-  <meta name="theme-color" content="#0b0c10">
+  <meta name="theme-color" content="#07111f">
   <link rel="icon" href="{{ url_for('static',filename='img/favicon.svg') }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}">
 </head>
 <body>
+<div class="ambient ambient-one"></div>
+<div class="ambient ambient-two"></div>
+
 {% if session.get('user_id') %}
 <div class="app-shell">
   <aside class="sidebar" id="sidebar">
-    <a class="brand" href="{{ url_for('dashboard') }}"><span class="brand-mark">₹</span><span><b>BUDGET</b><small>TRACKER</small></span></a>
+    <a class="brand" href="{{ url_for('dashboard') }}">
+      <span class="brand-mark">₹</span>
+      <span><b>BUDGET</b><small>FINANCE INTELLIGENCE</small></span>
+    </a>
+
     <nav>
-      <a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint=='dashboard' else '' }}"><span>▦</span> Dashboard</a>
+      <a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint=='dashboard' else '' }}"><span>◫</span> Overview</a>
       <a href="{{ url_for('transactions') }}" class="{{ 'active' if request.endpoint in ['transactions','edit_transaction'] else '' }}"><span>↕</span> Transactions</a>
-      <a href="{{ url_for('budgets') }}" class="{{ 'active' if request.endpoint=='budgets' else '' }}"><span>◫</span> Budgets</a>
+      <a href="{{ url_for('budgets') }}" class="{{ 'active' if request.endpoint=='budgets' else '' }}"><span>▦</span> Monthly Budgets</a>
       <a href="{{ url_for('goals') }}" class="{{ 'active' if request.endpoint=='goals' else '' }}"><span>◎</span> Savings Goals</a>
       <a href="{{ url_for('analytics') }}" class="{{ 'active' if request.endpoint=='analytics' else '' }}"><span>⌁</span> Analytics</a>
     </nav>
+
+    <div class="sidebar-project">
+      <small>WT PROJECT</small>
+      <strong>Budget Tracker</strong>
+      <p>Income, spending, savings and financial analytics.</p>
+    </div>
+
     <div class="sidebar-bottom">
       <a href="{{ url_for('export_csv') }}"><span>⇩</span> Export CSV</a>
       <a href="{{ url_for('logout') }}"><span>↪</span> Logout</a>
-      <div class="user-chip"><span>{{ session.get('user_name','U')[0]|upper }}</span><div><b>{{ session.get('user_name') }}</b><small>Personal wallet</small></div></div>
+      <div class="project-author">
+        <span>TN</span>
+        <div><b>Tushar Nayak</b><small>Project member</small></div>
+      </div>
     </div>
   </aside>
+
   <main class="main">
-    <header class="topbar"><button class="menu-btn" onclick="toggleSidebar()">☰</button><div><div class="eyebrow">PERSONAL FINANCE</div><h1>{% block page_title %}Dashboard{% endblock %}</h1></div><div class="live-pill"><i></i> LIVE TRACKING</div></header>
-    {% with messages=get_flashed_messages(with_categories=true) %}{% if messages %}<div class="flash-wrap">{% for cat,msg in messages %}<div class="flash {{ cat }}">{{ msg }}<button onclick="this.parentElement.remove()">×</button></div>{% endfor %}</div>{% endif %}{% endwith %}
+    <header class="topbar">
+      <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+      <div class="page-heading">
+        <div class="eyebrow">PERSONAL FINANCE</div>
+        <h1>{% block page_title %}Dashboard{% endblock %}</h1>
+      </div>
+      <div class="top-actions">
+        <div class="user-pill"><span>{{ session.get('user_name','U')[0]|upper }}</span><b>{{ session.get('user_name') }}</b></div>
+        <div class="live-pill"><i></i> LIVE TRACKING</div>
+      </div>
+    </header>
+
+    {% with messages=get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div class="flash-wrap">
+        {% for cat,msg in messages %}
+          <div class="flash {{ cat }}">{{ msg }}<button onclick="this.parentElement.remove()">×</button></div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    {% endwith %}
+
     {% block content %}{% endblock %}
-    <footer>Budget Tracker WT Project · {{ current_year }} · Tushar Nayak</footer>
+
+    <footer>
+      <span>Budget Tracker • Web Technology Project</span>
+      <span>Tushar Nayak</span>
+    </footer>
   </main>
 </div>
-{% else %}{% block auth_content %}{% endblock %}{% endif %}
+{% else %}
+  {% block auth_content %}{% endblock %}
+{% endif %}
+
 <script src="{{ url_for('static',filename='js/app.js') }}"></script>
 {% block scripts %}{% endblock %}
-</body></html>
+</body>
+</html>
