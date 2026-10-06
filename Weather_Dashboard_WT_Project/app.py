@@ -8,6 +8,13 @@ from flask import Flask, render_template, request, jsonify
 app = Flask(__name__)
 app.config["JSON_SORT_KEYS"] = False
 
+@app.after_request
+def disable_page_cache(response):
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
+
 GEOCODE_URL = "https://geocoding-api.open-meteo.com/v1/search"
 FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
 AIR_URL = "https://air-quality-api.open-meteo.com/v1/air-quality"
