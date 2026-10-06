@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#07111f">
+  <title>Atmos — Weather Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body data-theme="clear">
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="logo">
+        <div class="logo-icon">☁</div>
+        <div>
+          <strong>ATMOS</strong>
+          <small>WEATHER INTELLIGENCE</small>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <button class="nav-item active" data-jump="overview"><span>◫</span> Overview</button>
+        <button class="nav-item" data-jump="hourly"><span>◷</span> Hourly</button>
+        <button class="nav-item" data-jump="forecast"><span>▦</span> 7-Day Forecast</button>
+        <button class="nav-item" data-jump="details"><span>⌁</span> Weather Details</button>
+      </nav>
+
+      <div class="sidebar-card">
+        <small>WT PROJECT</small>
+        <strong>Weather Dashboard</strong>
+        <p>Live forecast & environmental analytics.</p>
+      </div>
+
+      <div class="author">
+        <span>TN</span>
+        <div>
+          <b>Tushar Nayak</b>
+          <small>Single-person project</small>
+        </div>
+      </div>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <button class="menu-btn" id="menuBtn">☰</button>
+
+        <div class="search-wrap">
+          <span class="search-icon">⌕</span>
+          <input id="cityInput" autocomplete="off" placeholder="Search city e.g. Rajkot, Ahmedabad, London">
+          <button id="searchBtn">Search</button>
+          <div id="suggestions" class="suggestions"></div>
+        </div>
+
+        <button class="location-btn" id="locationBtn" title="Use my current location">
+          <span>⌖</span>
+          <b>My Location</b>
+        </button>
+      </header>
+
+      <div id="errorBox" class="error-box"></div>
+
+      <section id="overview" class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow">LIVE WEATHER • <span id="localTime">--:--</span></div>
+          <h1 id="cityName">Loading weather...</h1>
+          <p id="cityMeta">Please wait</p>
+
+          <div class="current-row">
+            <div class="temperature" id="currentTemp">--°</div>
+            <div>
+              <div class="condition" id="condition">--</div>
+              <div class="feels" id="feelsLike">Feels like --°</div>
+            </div>
+          </div>
+
+          <div class="hero-mini">
+            <div><span>↑</span><b id="todayHigh">--°</b><small>High</small></div>
+            <div><span>↓</span><b id="todayLow">--°</b><small>Low</small></div>
+            <div><span>☂</span><b id="todayRain">--%</b><small>Rain</small></div>
+          </div>
+        </div>
+
+        <div class="weather-visual">
+          <div class="sun"></div>
+          <div class="cloud cloud-a"></div>
+          <div class="cloud cloud-b"></div>
+          <div class="rain-lines"></div>
+          <div class="weather-code" id="weatherIcon">☀</div>
+        </div>
+      </section>
+
+      <section class="metric-grid" id="details">
+        <article class="metric-card">
+          <div class="metric-icon">💧</div>
+          <div><small>HUMIDITY</small><h3 id="humidity">--%</h3><p id="humidityNote">Current relative humidity</p></div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-icon">〰</div>
+          <div><small>WIND SPEED</small><h3 id="wind">-- km/h</h3><p id="windDir">Direction --</p></div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-icon">◉</div>
+          <div><small>PRESSURE</small><h3 id="pressure">-- hPa</h3><p>Mean sea-level pressure</p></div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-icon">☁</div>
+          <div><small>CLOUD COVER</small><h3 id="clouds">--%</h3><p>Current sky coverage</p></div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-icon">☀</div>
+          <div><small>UV INDEX</small><h3 id="uv">--</h3><p id="uvText">Daily maximum</p></div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-icon">AQ</div>
+          <div><small>AIR QUALITY</small><h3 id="aqi">--</h3><p id="aqiText">US AQI</p></div>
+        </article>
+      </section>
+
+      <section id="hourly" class="section-block">
+        <div class="section-head">
+          <div>
+            <small>NEXT 24 HOURS</small>
+            <h2>Hourly Forecast</h2>
+          </div>
+          <div class="legend"><span></span> Temperature <i></i> Rain probability</div>
+        </div>
+
+        <div class="hourly-strip" id="hourlyStrip"></div>
+
+        <div class="chart-card">
+          <canvas id="hourlyChart"></canvas>
+        </div>
+      </section>
+
+      <section id="forecast" class="section-block">
+        <div class="section-head">
+          <div>
+            <small>WEEK AHEAD</small>
+            <h2>7-Day Forecast</h2>
+          </div>
+          <span id="forecastLocation" class="pill">--</span>
+        </div>
+        <div id="dailyGrid" class="daily-grid"></div>
+      </section>
+
+      <section class="bottom-grid section-block">
+        <article class="detail-panel">
+          <div class="panel-head"><div><small>DAYLIGHT</small><h3>Sunrise & Sunset</h3></div><span>☼</span></div>
+          <div class="sun-track"><div class="sun-dot"></div></div>
+          <div class="sun-times">
+            <div><small>SUNRISE</small><b id="sunrise">--</b></div>
+            <div class="right"><small>SUNSET</small><b id="sunset">--</b></div>
+          </div>
+        </article>
+
+        <article class="detail-panel">
+          <div class="panel-head"><div><small>AIR QUALITY</small><h3>Pollution Snapshot</h3></div><span>◌</span></div>
+          <div class="aq-grid">
+            <div><small>PM2.5</small><b id="pm25">--</b></div>
+            <div><small>PM10</small><b id="pm10">--</b></div>
+            <div><small>O₃</small><b id="ozone">--</b></div>
+            <div><small>NO₂</small><b id="no2">--</b></div>
+          </div>
+        </article>
+      </section>
+
+      <footer>
+        <span>Weather data: Open-Meteo</span>
+        <span>Weather Dashboard • Web Technology Project • Tushar Nayak</span>
+      </footer>
+    </main>
+  </div>
+
+  <div id="loader" class="loader show"><div></div><p>Reading the atmosphere...</p></div>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
