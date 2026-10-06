@@ -7,6 +7,85 @@ const fmt = (v, digits=0) => Number(v ?? 0).toFixed(digits);
 const moneyless = v => v == null ? "--" : Math.round(v);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 
+
+function weatherMeta(code){
+  code=Number(code||0);
+  const m={
+    0:["Clear sky","clear"],1:["Mainly clear","clear"],2:["Partly cloudy","cloudy"],3:["Overcast","cloudy"],
+    45:["Fog","fog"],48:["Rime fog","fog"],51:["Light drizzle","rain"],53:["Drizzle","rain"],55:["Heavy drizzle","rain"],
+    56:["Freezing drizzle","rain"],57:["Heavy freezing drizzle","rain"],61:["Light rain","rain"],63:["Rain","rain"],
+    65:["Heavy rain","rain"],66:["Freezing rain","rain"],67:["Heavy freezing rain","rain"],71:["Light snow","snow"],
+    73:["Snow","snow"],75:["Heavy snow","snow"],77:["Snow grains","snow"],80:["Light showers","rain"],81:["Showers","rain"],
+    82:["Heavy showers","storm"],85:["Snow showers","snow"],86:["Heavy snow showers","snow"],95:["Thunderstorm","storm"],
+    96:["Thunderstorm with hail","storm"],99:["Severe thunderstorm","storm"]
+  };
+  return m[code]||["Weather","cloudy"];
+}
+
+async function geocodeOne(city){
+  const u=new URL("https://geocoding-api.open-meteo.com/v1/search");
+  u.search=new URLSearchParams({name:city,count:"1",language:"en",format:"json"}).toString();
+  const r=await fetch(u);
+  if(!r.ok) throw new Error("Location search failed.");
+  const d=await r.json();
+  const x=d.results && d.results[0];
+  if(!x) throw new Error("City not found. Try another spelling.");
+  return {name:x.name,admin1:x.admin1||null,country:x.country||null,latitude:x.latitude,longitude:x.longitude,timezone:x.timezone||null};
+}
+
+async function fetchWeatherDirect(params){
+  let location,lat,lon;
+  if(params.city){
+    location=await geocodeOne(params.city);
+    lat=location.latitude; lon=location.longitude;
+  }else{
+    lat=Number(params.lat); lon=Number(params.lon);
+    location={name:"Current location",admin1:null,country:null,latitude:lat,longitude:lon,timezone:null};
+  }
+
+  const f=new URL("https://api.open-meteo.com/v1/forecast");
+  f.search=new URLSearchParams({
+    latitude:String(lat),longitude:String(lon),
+    current:"temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,rain,weather_code,cloud_cover,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m",
+    hourly:"temperature_2m,apparent_temperature,precipitation_probability,weather_code,wind_speed_10m,relative_humidity_2m",
+    daily:"weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,sunrise,sunset,uv_index_max,precipitation_probability_max,wind_speed_10m_max",
+    temperature_unit:"celsius",wind_speed_unit:"kmh",precipitation_unit:"mm",timezone:"auto",forecast_days:"7"
+  }).toString();
+
+  const a=new URL("https://air-quality-api.open-meteo.com/v1/air-quality");
+  a.search=new URLSearchParams({
+    latitude:String(lat),longitude:String(lon),
+    current:"us_aqi,pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,ozone",
+    timezone:"auto"
+  }).toString();
+
+  const wr=await fetch(f);
+  if(!wr.ok) throw new Error("Weather service is temporarily unavailable. Please try again.");
+  const wx=await wr.json();
+
+  let aq={};
+  try{
+    const ar=await fetch(a);
+    if(ar.ok) aq=await ar.json();
+  }catch(e){}
+
+  const meta=weatherMeta(wx.current && wx.current.weather_code);
+  const codes=(wx.daily && wx.daily.weather_code)||[];
+  return {
+    location:location,
+    timezone:wx.timezone,
+    timezone_abbreviation:wx.timezone_abbreviation,
+    elevation:wx.elevation,
+    current:wx.current||{},
+    condition:meta[0],
+    theme:meta[1],
+    hourly:wx.hourly||{},
+    daily:wx.daily||{},
+    daily_labels:codes.map(function(x){return weatherMeta(x)[0]}),
+    air_quality:(aq.current||{})
+  };
+}
+
 function iconFor(code, isDay=1){
   code = Number(code);
   if(code===0) return isDay ? "☀️" : "🌙";
@@ -174,15 +253,14 @@ function renderDaily(d,labels){
 async function loadWeather(params){
   setLoading(true);
   try{
-    const q=new URLSearchParams(params);
-    const res=await fetch("/api/weather?"+q.toString());
-    const data=await res.json();
-    if(!res.ok) throw new Error(data.error || "Could not load weather.");
+    const data=await fetchWeatherDirect(params);
     render(data);
     if(params.city) localStorage.setItem("weather_city", params.city);
   }catch(e){
     showError(e.message || "Weather request failed.");
-  }finally{ setLoading(false); }
+  }finally{
+    setLoading(false);
+  }
 }
 
 async function doSearch(){
@@ -200,19 +278,23 @@ $("cityInput").addEventListener("input",()=>{
   if(q.length<3){$("suggestions").classList.remove("show");return;}
   debounceTimer=setTimeout(async()=>{
     try{
-      const r=await fetch("/api/search?city="+encodeURIComponent(q));
+      const u=new URL("https://geocoding-api.open-meteo.com/v1/search");
+      u.search=new URLSearchParams({name:q,count:"6",language:"en",format:"json"}).toString();
+      const r=await fetch(u);
       const data=await r.json();
-      if(!r.ok || !Array.isArray(data)) return;
-      $("suggestions").innerHTML=data.map(x=>`<div class="suggestion" data-name="${esc(x.name)}">
-        <b>${esc(x.name)}</b><small>${esc([x.admin1,x.country].filter(Boolean).join(", "))}</small>
-      </div>`).join("");
-      $("suggestions").classList.toggle("show",data.length>0);
-      document.querySelectorAll(".suggestion").forEach(el=>el.addEventListener("click",()=>{
-        $("cityInput").value=el.dataset.name;
-        $("suggestions").classList.remove("show");
-        loadWeather({city:el.dataset.name});
-      }));
-    }catch{}
+      const rows=data.results||[];
+      $("suggestions").innerHTML=rows.map(function(x){
+        return '<div class="suggestion" data-name="'+esc(x.name)+'"><b>'+esc(x.name)+'</b><small>'+esc([x.admin1,x.country].filter(Boolean).join(", "))+'</small></div>';
+      }).join("");
+      $("suggestions").classList.toggle("show",rows.length>0);
+      document.querySelectorAll(".suggestion").forEach(function(el){
+        el.addEventListener("click",function(){
+          $("cityInput").value=el.dataset.name;
+          $("suggestions").classList.remove("show");
+          loadWeather({city:el.dataset.name});
+        });
+      });
+    }catch(e){}
   },320);
 });
 
