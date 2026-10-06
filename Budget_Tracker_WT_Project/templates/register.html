@@ -1,0 +1,9 @@
+{% extends 'base.html' %}{% block title %}Register · Budget Tracker{% endblock %}{% block auth_content %}
+<div class="auth-page"><div class="auth-glow"></div><section class="auth-card">
+<div class="brand big"><span class="brand-mark">₹</span><span><b>BUDGET</b><small>TRACKER</small></span></div>
+<div class="eyebrow">START YOUR FINANCE DASHBOARD</div><h1>Create account.</h1><p class="muted">Your local project database keeps each account's transactions separate.</p>
+{% with messages=get_flashed_messages(with_categories=true) %}{% if messages %}{% for cat,msg in messages %}<div class="flash {{ cat }}">{{ msg }}</div>{% endfor %}{% endif %}{% endwith %}
+<form method="post" class="stack"><label>Name<input name="name" placeholder="Your name" required></label><label>Email<input type="email" name="email" placeholder="you@example.com" required></label><label>Password<input type="password" name="password" minlength="6" placeholder="Minimum 6 characters" required></label><button class="btn primary wide">CREATE ACCOUNT →</button></form>
+<p class="auth-switch">Already registered? <a href="{{ url_for('login') }}">Login</a></p></section>
+<aside class="auth-preview"><div class="feature-list"><div>01 <span>Track income & expenses</span></div><div>02 <span>Set monthly budgets</span></div><div>03 <span>Measure savings goals</span></div><div>04 <span>Visualize spending</span></div></div></aside></div>
+{% endblock %}

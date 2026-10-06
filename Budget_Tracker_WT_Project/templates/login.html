@@ -1,0 +1,9 @@
+{% extends 'base.html' %}{% block title %}Login · Budget Tracker{% endblock %}{% block auth_content %}
+<div class="auth-page"><div class="auth-glow"></div><section class="auth-card">
+<div class="brand big"><span class="brand-mark">₹</span><span><b>BUDGET</b><small>TRACKER</small></span></div>
+<div class="eyebrow">WT PROJECT · PERSONAL FINANCE</div><h1>Welcome back.</h1><p class="muted">Track every rupee. Control every category. Build better money habits.</p>
+{% with messages=get_flashed_messages(with_categories=true) %}{% if messages %}{% for cat,msg in messages %}<div class="flash {{ cat }}">{{ msg }}</div>{% endfor %}{% endif %}{% endwith %}
+<form method="post" class="stack"><label>Email<input type="email" name="email" placeholder="you@example.com" required></label><label>Password<input type="password" name="password" placeholder="Minimum 6 characters" required></label><button class="btn primary wide">LOGIN TO DASHBOARD →</button></form>
+<p class="auth-switch">New here? <a href="{{ url_for('register') }}">Create an account</a></p>
+</section><aside class="auth-preview"><div class="preview-card"><span>THIS MONTH</span><strong>₹31,050</strong><small>Available balance</small></div><div class="mini-grid"><div><span>Income</span><b>₹35K</b></div><div><span>Spent</span><b>₹3.9K</b></div><div><span>Saved</span><b>88%</b></div></div></aside></div>
+{% endblock %}

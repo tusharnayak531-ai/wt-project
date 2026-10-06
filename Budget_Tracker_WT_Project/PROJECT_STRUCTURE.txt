@@ -1,0 +1,21 @@
+Budget_Tracker_WT_Project/
+├── app.py                  Flask backend + SQLite business logic
+├── requirements.txt        Python dependencies
+├── Procfile                Render/Heroku-compatible start command
+├── render.yaml             Render Blueprint configuration
+├── run_mac_linux.sh        One-command local setup for macOS/Linux
+├── run_windows.bat         One-command local setup for Windows
+├── README.md               Setup + deployment guide
+├── templates/
+│   ├── base.html           Shared layout/sidebar
+│   ├── login.html
+│   ├── register.html
+│   ├── dashboard.html
+│   ├── transactions.html
+│   ├── budgets.html
+│   ├── goals.html
+│   └── analytics.html
+└── static/
+    ├── css/style.css       Responsive dark dashboard UI
+    ├── js/app.js           UI interactions + Chart.js setup
+    └── img/favicon.svg
