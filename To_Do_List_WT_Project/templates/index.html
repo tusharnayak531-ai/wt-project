@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b1614">
+  <title>TaskFlow — To-Do List</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}">
+</head>
+<body>
+<div class="ambient ambient-one"></div>
+<div class="ambient ambient-two"></div>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <a href="{{ url_for('index') }}" class="brand">
+      <span class="brand-mark">✓</span>
+      <span><b>TASKFLOW</b><small>PRODUCTIVITY SYSTEM</small></span>
+    </a>
+
+    <nav>
+      <a class="{{ 'active' if view=='all' else '' }}" href="{{ url_for('index',view='all') }}"><span>◫</span> All Tasks</a>
+      <a class="{{ 'active' if view=='today' else '' }}" href="{{ url_for('index',view='today') }}"><span>◷</span> Today</a>
+      <a class="{{ 'active' if view=='overdue' else '' }}" href="{{ url_for('index',view='overdue') }}"><span>!</span> Overdue</a>
+      <a class="{{ 'active' if view=='completed' else '' }}" href="{{ url_for('index',view='completed') }}"><span>✓</span> Completed</a>
+      <a href="#analytics"><span>⌁</span> Analytics</a>
+    </nav>
+
+    <div class="sidebar-card">
+      <small>WT PROJECT</small>
+      <strong>To-Do List</strong>
+      <p>Plan tasks, manage priorities and track progress.</p>
+    </div>
+
+    <div class="sidebar-bottom">
+      <a href="{{ url_for('export_csv') }}"><span>⇩</span> Export CSV</a>
+      <div class="author">
+        <span>AG</span>
+        <div><b>Arkey Gatrad</b><small>Project member</small></div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="content">
+    <header class="topbar">
+      <button class="menu-btn" id="menuBtn">☰</button>
+      <div class="heading">
+        <small>PRODUCTIVITY DASHBOARD</small>
+        <h1>To-Do List</h1>
+      </div>
+      <button class="add-btn" onclick="openAdd()">+ New Task</button>
+    </header>
+
+    {% with messages=get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div class="flash-wrap">
+        {% for cat,msg in messages %}
+          <div class="flash {{ cat }}">{{ msg }}<button onclick="this.parentElement.remove()">×</button></div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    {% endwith %}
+
+    <section class="hero">
+      <div>
+        <div class="eyebrow">FOCUS MODE • {{ today }}</div>
+        <h2>Turn plans into progress.</h2>
+        <p>Stay clear on what matters, finish tasks on time, and keep momentum visible.</p>
+        <div class="hero-mini">
+          <div><span>✓</span><b>{{ stats.completed or 0 }}</b><small>Completed</small></div>
+          <div><span>◷</span><b>{{ stats.in_progress or 0 }}</b><small>In progress</small></div>
+          <div><span>!</span><b>{{ stats.overdue or 0 }}</b><small>Overdue</small></div>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="orbit one"></div>
+        <div class="orbit two"></div>
+        <div class="progress-ring" style="--progress:{{ completion_rate }}">
+          <div><b>{{ completion_rate|round(0)|int }}%</b><small>DONE</small></div>
+        </div>
+        <div class="float-chip chip-one">⚡ Focus first</div>
+        <div class="float-chip chip-two">✓ Keep moving</div>
+      </div>
+    </section>
+
+    <section class="metric-grid">
+      <article><span class="metric-icon">▦</span><div><small>TOTAL TASKS</small><h3>{{ stats.total or 0 }}</h3><p>Everything on your list</p></div></article>
+      <article><span class="metric-icon emerald">✓</span><div><small>COMPLETED</small><h3>{{ stats.completed or 0 }}</h3><p>{{ completion_rate }}% completion rate</p></div></article>
+      <article><span class="metric-icon amber">◷</span><div><small>IN PROGRESS</small><h3>{{ stats.in_progress or 0 }}</h3><p>Currently being worked on</p></div></article>
+      <article><span class="metric-icon red">!</span><div><small>OVERDUE</small><h3>{{ stats.overdue or 0 }}</h3><p>Needs your attention</p></div></article>
+    </section>
+
+    <section class="control-panel">
+      <form class="filters" method="get">
+        <input type="hidden" name="view" value="{{ view }}">
+        <div class="search-field"><span>⌕</span><input name="q" value="{{ q }}" placeholder="Search tasks..."></div>
+        <select name="status" onchange="this.form.submit()">
+          <option value="">All statuses</option>
+          {% for x in statuses %}<option {{ 'selected' if x==status else '' }}>{{ x }}</option>{% endfor %}
+        </select>
+        <select name="priority" onchange="this.form.submit()">
+          <option value="">All priorities</option>
+          {% for x in priorities %}<option {{ 'selected' if x==priority else '' }}>{{ x }}</option>{% endfor %}
+        </select>
+        <select name="category" onchange="this.form.submit()">
+          <option value="">All categories</option>
+          {% for x in categories %}<option {{ 'selected' if x==category else '' }}>{{ x }}</option>{% endfor %}
+        </select>
+        <button>Filter</button>
+      </form>
+    </section>
+
+    <section class="section-head">
+      <div><small>{{ view|upper }} VIEW</small><h2>Your Tasks</h2></div>
+      <span class="count-pill">{{ tasks|length }} shown</span>
+    </section>
+
+    <section class="task-grid">
+      {% for t in tasks %}
+      {% set overdue = t.status != 'Completed' and t.due_date and t.due_date < today %}
+      <article class="task-card {{ 'done' if t.status=='Completed' else '' }} {{ 'overdue' if overdue else '' }}">
+        <div class="task-top">
+          <span class="priority {{ t.priority|lower }}">{{ t.priority }}</span>
+          <span class="status {{ t.status|lower|replace(' ','-') }}">{{ t.status }}</span>
+        </div>
+
+        <div class="task-check-title">
+          <form method="post" action="{{ url_for('toggle_task',task_id=t.id) }}">
+            <button class="check-btn {{ 'checked' if t.status=='Completed' else '' }}">{{ '✓' if t.status=='Completed' else '' }}</button>
+          </form>
+          <div>
+            <h3>{{ t.title }}</h3>
+            <p>{{ t.description or 'No description added.' }}</p>
+          </div>
+        </div>
+
+        <div class="task-meta">
+          <span>▣ {{ t.category }}</span>
+          <span class="{{ 'danger-text' if overdue else '' }}">◷ {{ t.due_date or 'No due date' }}</span>
+        </div>
+
+        <div class="task-actions">
+          <button onclick="openEdit({{ t.id }})">Edit</button>
+          <form method="post" action="{{ url_for('delete_task',task_id=t.id) }}" onsubmit="return confirm('Delete this task?')">
+            <button class="delete">Delete</button>
+          </form>
+        </div>
+      </article>
+
+      <div class="modal" id="edit-{{ t.id }}">
+        <form class="modal-card" method="post" action="{{ url_for('update_task',task_id=t.id) }}">
+          <div class="modal-head"><div><small>EDIT TASK</small><h3>{{ t.title }}</h3></div><button type="button" onclick="closeEdit({{ t.id }})">×</button></div>
+          <label>Title<input name="title" value="{{ t.title }}" required></label>
+          <label>Description<textarea name="description">{{ t.description or '' }}</textarea></label>
+          <div class="form-row">
+            <label>Category<select name="category">{% for x in categories %}<option {{ 'selected' if x==t.category else '' }}>{{ x }}</option>{% endfor %}</select></label>
+            <label>Priority<select name="priority">{% for x in priorities %}<option {{ 'selected' if x==t.priority else '' }}>{{ x }}</option>{% endfor %}</select></label>
+          </div>
+          <div class="form-row">
+            <label>Status<select name="status">{% for x in statuses %}<option {{ 'selected' if x==t.status else '' }}>{{ x }}</option>{% endfor %}</select></label>
+            <label>Due date<input type="date" name="due_date" value="{{ t.due_date or '' }}"></label>
+          </div>
+          <button class="primary full">Save Changes</button>
+        </form>
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <div>✓</div>
+        <h3>No tasks found</h3>
+        <p>Try changing your filters or add a new task.</p>
+        <button onclick="openAdd()">Create Task</button>
+      </div>
+      {% endfor %}
+    </section>
+
+    <section id="analytics" class="analytics-grid">
+      <article class="panel">
+        <div class="panel-head"><div><small>TASK DISTRIBUTION</small><h2>By Category</h2></div></div>
+        <div class="chart-box"><canvas id="categoryChart"></canvas></div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-head"><div><small>OPEN WORK</small><h2>Priority Load</h2></div></div>
+        <div class="chart-box"><canvas id="priorityChart"></canvas></div>
+      </article>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><div><small>RECENT PROGRESS</small><h2>Recently Completed</h2></div></div>
+      <div class="recent-list">
+        {% for t in recent %}
+          <div><span>✓</span><div><b>{{ t.title }}</b><small>{{ t.category }} • {{ t.priority }} priority</small></div><em>{{ t.due_date or 'No due date' }}</em></div>
+        {% else %}
+          <p class="muted">Complete a task and it will appear here.</p>
+        {% endfor %}
+      </div>
+    </section>
+
+    <footer>
+      <span>TaskFlow • Web Technology Project</span>
+      <span>Arkey Gatrad</span>
+    </footer>
+  </main>
+</div>
+
+<div class="modal" id="addModal">
+  <form class="modal-card" method="post" action="{{ url_for('add_task') }}">
+    <div class="modal-head"><div><small>NEW TASK</small><h3>Create a task</h3></div><button type="button" onclick="closeAdd()">×</button></div>
+    <label>Task title<input name="title" placeholder="What needs to be done?" required></label>
+    <label>Description<textarea name="description" placeholder="Add notes or details..."></textarea></label>
+    <div class="form-row">
+      <label>Category<select name="category">{% for x in categories %}<option>{{ x }}</option>{% endfor %}</select></label>
+      <label>Priority<select name="priority">{% for x in priorities %}<option>{{ x }}</option>{% endfor %}</select></label>
+    </div>
+    <div class="form-row">
+      <label>Status<select name="status">{% for x in statuses %}<option>{{ x }}</option>{% endfor %}</select></label>
+      <label>Due date<input type="date" name="due_date" value="{{ today }}"></label>
+    </div>
+    <button class="primary full">Add Task</button>
+  </form>
+</div>
+
+<script>
+window.CHART_DATA = {
+  categories: {{ cat_rows|map(attribute='category')|list|tojson }},
+  categoryValues: {{ cat_rows|map(attribute='total')|list|tojson }},
+  priorities: {{ priority_rows|map(attribute='priority')|list|tojson }},
+  priorityValues: {{ priority_rows|map(attribute='total')|list|tojson }}
+};
+</script>
+<script src="{{ url_for('static',filename='js/app.js') }}"></script>
+</body>
+</html>
