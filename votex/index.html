@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#080e21" />
+  <meta name="description" content="VOTEX — premium online polling and voting dashboard for Web Technology projects." />
+  <title>VOTEX — Online Polling & Voting System</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+      <div class="brand"><div class="brand-mark" aria-hidden="true">V<span>✓</span></div><div><strong>VOTEX</strong><small>VOTING INTELLIGENCE</small></div></div>
+      <div class="workspace-label">WORKSPACE <span>01</span></div>
+      <nav class="nav" aria-label="Main">
+        <button class="nav-item active" data-page="overview"><span class="nav-ico">◫</span> Overview <span class="nav-end">↗</span></button>
+        <button class="nav-item" data-page="elections"><span class="nav-ico">▣</span> Explore Polls <span class="nav-count" id="navPollCount">0</span></button>
+        <button class="nav-item" data-page="results"><span class="nav-ico">▥</span> Live Results</button>
+        <button class="nav-item" data-page="history"><span class="nav-ico">◷</span> My Votes</button>
+        <button class="nav-item" data-page="manage"><span class="nav-ico">⚙</span> Manage Polls</button>
+      </nav>
+      <div class="side-bottom">
+        <div class="system-indicator"><i></i> DEMO SYSTEM ONLINE</div>
+        <div class="side-info">WEB TECHNOLOGY PROJECT<br><b>HTML · CSS · JAVASCRIPT</b></div>
+        <div class="side-note">Data stays in this browser.<br>Not a secure election platform.</div>
+      </div>
+    </aside>
+
+    <div class="main-area">
+      <header class="topbar">
+        <button class="icon-button mobile-menu" id="menuBtn" aria-label="Open navigation">☰</button>
+        <div class="breadcrumb"><span>WORKSPACE</span> <span class="slash">/</span> <strong id="pageBreadcrumb">Overview</strong></div>
+        <div class="top-actions"><span class="online-pill"><i></i> SYSTEM ACTIVE</span><button id="themeBtn" class="icon-button theme-btn" aria-label="Toggle theme" title="Toggle theme">☾</button><div class="avatar" aria-label="Demo user">VU</div></div>
+      </header>
+
+      <main id="main">
+        <section class="page active" id="page-overview" aria-labelledby="overviewTitle">
+          <div class="hero">
+            <div class="hero-decoration orb-1"></div><div class="hero-decoration orb-2"></div>
+            <div class="hero-content"><div class="eyebrow"><span class="signal-dot"></span> THE FUTURE OF DIGITAL VOTING</div><h1 id="overviewTitle">Your voice.<br><em>Your decision.</em></h1><p>A smarter way to participate. Discover polls, cast your vote, and explore results — all in one beautifully simple dashboard.</p><div class="hero-actions"><button class="btn btn-primary" data-go="elections">Explore Active Polls <span>↗</span></button><button class="btn btn-glass" data-go="results">View Live Results <span>→</span></button></div></div>
+            <div class="hero-visual" aria-hidden="true"><div class="vote-glow"></div><div class="vote-card"><div class="ballot-line"></div><div class="ballot-line short"></div><div class="ballot-line"></div><div class="ballot-check">✓</div></div><div class="visual-caption">MAKE IT COUNT <span>✦</span></div></div>
+          </div>
+          <div class="section-heading stats-heading"><div><p class="kicker">PLATFORM SNAPSHOT</p><h2>Dashboard overview</h2></div><span class="update-pill">● Browser data · Live updates</span></div>
+          <div class="stats-grid">
+            <div class="stat-card"><div class="stat-top"><span>ACTIVE POLLS</span><div class="stat-symbol">▣</div></div><div class="stat-number" id="statActive">0</div><div class="stat-foot">Open for participation</div></div>
+            <div class="stat-card"><div class="stat-top"><span>TOTAL VOTES</span><div class="stat-symbol purple">↗</div></div><div class="stat-number" id="statVotes">0</div><div class="stat-foot">Recorded in this browser</div></div>
+            <div class="stat-card"><div class="stat-top"><span>MY PARTICIPATION</span><div class="stat-symbol blue">✓</div></div><div class="stat-number" id="statMine">0</div><div class="stat-foot">Polls you've voted in</div></div>
+            <div class="stat-card"><div class="stat-top"><span>TOTAL POLLS</span><div class="stat-symbol orange">◈</div></div><div class="stat-number" id="statTotal">0</div><div class="stat-foot">Created in demo workspace</div></div>
+          </div>
+          <div class="content-grid">
+            <section class="panel feature-panel"><div class="panel-header"><div><p class="kicker">FEATURED ELECTIONS</p><h3>Cast your next vote</h3></div><button class="text-link" data-go="elections">View all <span>↗</span></button></div><div id="featuredList" class="featured-list"></div></section>
+            <section class="panel activity-panel"><div class="panel-header"><div><p class="kicker">QUICK INSIGHTS</p><h3>Participation tracker</h3></div><div class="tiny-icon">◉</div></div><div id="participationView"></div><div class="micro-note"><span class="micro-dot"></span> Results update immediately on this device.</div></section>
+          </div>
+          <div class="notice"><div class="notice-icon">ⓘ</div><div><strong>About this demo</strong><p>This is a front-end project. Polls and votes are saved using localStorage in this browser only. Votes are not shared across devices and identity cannot be verified.</p></div></div>
+        </section>
+
+        <section class="page" id="page-elections" aria-labelledby="electionsTitle"><div class="page-title-row"><div><p class="kicker">HAVE YOUR SAY</p><h1 id="electionsTitle">Explore Polls</h1><p class="page-sub">Find a poll that matters to you and make your voice heard.</p></div><button class="btn btn-primary" data-action="create">+ Create a Poll</button></div>
+          <div class="toolbar"><label class="search-field"><span>⌕</span><input id="pollSearch" type="search" placeholder="Search polls, topics..." autocomplete="off" /></label><div class="filter-buttons" role="group" aria-label="Filter polls"><button class="filter active" data-filter="all">All polls</button><button class="filter" data-filter="active">Active</button><button class="filter" data-filter="closed">Closed</button><button class="filter" data-filter="voted">Voted</button></div></div><div class="poll-grid" id="pollGrid"></div>
+        </section>
+
+        <section class="page" id="page-results" aria-labelledby="resultsTitle"><div class="page-title-row"><div><p class="kicker">TRANSPARENT INSIGHTS</p><h1 id="resultsTitle">Voting Results</h1><p class="page-sub">Explore the current results stored in your local demo.</p></div><button class="btn btn-outline" id="exportAllBtn">↓ Export CSV</button></div><div class="results-summary" id="resultsSummary"></div><div class="result-list" id="resultsList"></div></section>
+
+        <section class="page" id="page-history" aria-labelledby="historyTitle"><div class="page-title-row"><div><p class="kicker">YOUR PARTICIPATION</p><h1 id="historyTitle">My Voting History</h1><p class="page-sub">A record of votes cast in this browser.</p></div></div><div class="history-list panel" id="historyList"></div></section>
+
+        <section class="page" id="page-manage" aria-labelledby="manageTitle"><div class="page-title-row"><div><p class="kicker">DEMO CONTROL CENTER</p><h1 id="manageTitle">Manage Polls</h1><p class="page-sub">Create, close or delete polls in your personal browser demo.</p></div><button class="btn btn-primary" data-action="create">+ New Poll</button></div><div class="notice manage-notice"><div class="notice-icon">!</div><div><strong>No authentication or central database</strong><p>Management is open to anyone using this browser. For real elections, use a secure server, user accounts and a database.</p></div></div><div class="panel manage-panel"><div class="panel-header"><div><p class="kicker">POLL DIRECTORY</p><h3>All created polls</h3></div><span class="pill" id="manageCount">0 total</span></div><div id="manageList"></div></div><div class="danger-zone"><div><strong>Reset demo data</strong><p>Restore example polls and remove all locally stored votes.</p></div><button class="btn btn-danger-outline" id="resetBtn">Reset Demo</button></div></section>
+      </main>
+      <footer><span><b>VOTEX</b> © <span id="year"></span> · Online Polling / Voting System</span><span>Built for Web Technology · Front-end demo</span></footer>
+    </div>
+  </div>
+  <div class="mobile-backdrop" id="backdrop"></div>
+  <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-header"><div><p class="kicker" id="modalKicker">CAST YOUR VOTE</p><h2 id="modalTitle">Poll</h2></div><button class="icon-button" id="modalClose" aria-label="Close dialog">✕</button></div><div id="modalBody"></div></div></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
