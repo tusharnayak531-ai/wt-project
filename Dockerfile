@@ -11,6 +11,6 @@ RUN unzip -q /tmp/srms.zip -d /tmp/project \
  && chmod +x /usr/local/bin/launch-app \
  && chown -R www-data:www-data /var/www/html \
  && rm -rf /tmp/project /tmp/srms.zip
-ENV PORT=10000 DB_NAME=iu_result_portal DB_USER=resultapp DB_HOST=127.0.0.1 DB_PORT=3306 SEED_DEMO=1
+ENV PORT=10000 DB_NAME=iu_result_portal DB_USER=resultapp DB_HOST=127.0.0.1 DB_PORT=3306 SEED_DEMO=1 DB_PASSWORD=LocalDemoDbOnly
 EXPOSE 10000
 CMD ["/usr/local/bin/launch-app"]
