@@ -13,4 +13,4 @@ if hashlib.sha256(source).hexdigest() != expected:
     raise SystemExit("Authentication source integrity check failed")
 source_file = root / "edupredict_auth.py"
 source_file.write_bytes(source)
-runpy.run_path(str(source_file), run_name="__main__")
+runpy.run_path(str(root / "edupredict_academic_extension.py"), run_name="__main__")
