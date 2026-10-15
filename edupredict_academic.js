@@ -6,6 +6,29 @@ const esc = (value) => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;
 const point = (percent) => percent >= 90 ? 10 : percent >= 80 ? 9 : percent >= 70 ? 8 : percent >= 60 ? 7 : percent >= 50 ? 6 : percent >= 40 ? 5 : 0;
 const scorePct = (m) => m.max > 0 ? 100 * m.score / m.max : 0;
 const uid = () => typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + "-" + String(Math.random()).slice(2);
+const COMPONENT_KEYS = ["cie-theory", "mid-sem", "cie-practical", "ese-theory", "ese-practical"];
+let editingMarkId = null;
+function readComponents() {
+  const components = {};
+  let score = 0, max = 0;
+  for (const key of COMPONENT_KEYS) {
+    const obtainedEl = $(key), maximumEl = $("max-" + key);
+    if (!obtainedEl.value.trim() || !maximumEl.value.trim()) return null;
+    const obtained = Number(obtainedEl.value), maximum = Number(maximumEl.value);
+    if (!Number.isFinite(obtained) || !Number.isFinite(maximum) || obtained < 0 || maximum < 0 ||
+        maximum > 1000 || obtained > maximum) return null;
+    components[key] = {score: obtained, max: maximum};
+    score += obtained; max += maximum;
+  }
+  if (max <= 0) return null;
+  return {components, score, max};
+}
+function updateTotalPreview() {
+  const data = readComponents();
+  $("manual-total-preview").textContent = data
+    ? "Total: " + fmt(data.score, 1) + " / " + fmt(data.max, 1) + "  ·  " + fmt(100 * data.score / data.max, 1) + "%  ·  " + point(100 * data.score / data.max) + " GP"
+    : "Please enter valid marks. Obtained marks cannot exceed each component's maximum.";
+}
 const blank = () => ({ marks: [], attendance: [], assignments: [], goal: 9 });
 function load() {
   try {
@@ -93,7 +116,7 @@ function renderOverview() {
 function renderMarks() {
   metric("record-count", state.marks.length + " RECORDS");
   const rows = state.marks.slice().sort((a,b) => Number(b.semester) - Number(a.semester) || String(a.subject).localeCompare(String(b.subject)));
-  $("marks-table").innerHTML = rows.map(m => `<tr><td>${esc(m.subject)}</td><td>${Number(m.semester)}</td><td>${Number(m.score)} / ${Number(m.max)}</td><td>${fmt(scorePct(m),1)}%</td><td>${point(scorePct(m))}</td><td>${Number(m.credits)}</td><td><button type="button" class="delete-btn" data-remove-mark="${esc(m.id)}" aria-label="Delete ${esc(m.subject)}">Remove</button></td></tr>`).join("");
+  $("marks-table").innerHTML = rows.map(m => `<tr><td>${esc(m.subject)}</td><td>${Number(m.semester)}</td><td>${Number(m.score)} / ${Number(m.max)}</td><td>${fmt(scorePct(m),1)}%</td><td>${point(scorePct(m))}</td><td>${Number(m.credits)}</td><td><button type="button" class="edit-btn" data-edit-mark="${esc(m.id)}" aria-label="Edit ${esc(m.subject)}">Edit</button> <button type="button" class="delete-btn" data-remove-mark="${esc(m.id)}" aria-label="Delete ${esc(m.subject)}">Remove</button></td></tr>`).join("");
   $("marks-empty").classList.toggle("hidden", rows.length !== 0);
 }
 function renderGrades() {
@@ -146,17 +169,56 @@ function render() {
 }
 $("marks-form").addEventListener("submit", event => {
   event.preventDefault();
-  const subject=$("subject-name").value.trim(), semester=Number($("subject-semester").value), credits=Number($("subject-credits").value), score=Number($("subject-score").value), max=Number($("subject-max").value);
-  if (!subject || !Number.isInteger(semester) || semester<1 || semester>12 || !Number.isInteger(credits) || credits<1 || credits>12 || !Number.isFinite(score) || score<0 || !Number.isFinite(max) || max<=0 || max>1000 || score>max) return notify("Please enter valid marks, credits and semester.");
-  const previous = state.marks.find(m => Number(m.semester)===semester && String(m.subject).toLowerCase()===subject.toLowerCase());
-  if (previous) Object.assign(previous,{subject,semester,credits,score,max});
-  else state.marks.push({id:uid(),subject,semester,credits,score,max});
-  $("subject-name").value=""; save();notify("Subject result saved.");
+  const subject = $("subject-name").value.trim(), semester = Number($("subject-semester").value),
+        credits = Number($("subject-credits").value), result = readComponents();
+  if (!subject || !Number.isInteger(semester) || semester < 1 || semester > 12 ||
+      !Number.isInteger(credits) || credits < 1 || credits > 12 || !result) {
+    return notify("Check the subject, semester, credits and each exam's obtained/maximum marks.");
+  }
+  const conflicting = state.marks.find(m => Number(m.semester) === semester &&
+    String(m.subject).toLowerCase() === subject.toLowerCase() && m.id !== editingMarkId);
+  const record = editingMarkId ? state.marks.find(m => m.id === editingMarkId) : conflicting;
+  const data = {subject, semester, credits, ...result};
+  if (record) Object.assign(record, data);
+  else state.marks.push({id: uid(), ...data});
+  editingMarkId = null;
+  $("marks-form").querySelector("button[type=submit]").textContent = "+ Save subject result";
+  $("subject-name").value = "";
+  save();
+  notify("Subject marks saved and grade totals updated.");
 });
 $("marks-table").addEventListener("click", event => {
-  const id=event.target.closest("[data-remove-mark]")?.dataset.removeMark;
-  if(id){state.marks=state.marks.filter(m=>m.id!==id);save();notify("Subject removed.");}
+  const edit = event.target.closest("[data-edit-mark]")?.dataset.editMark;
+  if (edit) {
+    const m = state.marks.find(row => row.id === edit);
+    if (!m) return;
+    editingMarkId = m.id;
+    $("subject-name").value = m.subject;
+    $("subject-semester").value = m.semester;
+    $("subject-credits").value = m.credits;
+    COMPONENT_KEYS.forEach(key => {
+      const component = m.components?.[key] || (key === "ese-theory" && !m.components ? {score:m.score,max:m.max} : {score:0,max:0});
+      $(key).value = component.score;
+      $("max-" + key).value = component.max;
+    });
+    $("marks-form").querySelector("button[type=submit]").textContent = "Update subject result";
+    updateTotalPreview();
+    $("marks-form").scrollIntoView({behavior: "smooth", block:"center"});
+    notify("Edit marks and select Update subject result.");
+    return;
+  }
+  const id = event.target.closest("[data-remove-mark]")?.dataset.removeMark;
+  if (id) {
+    state.marks = state.marks.filter(m => m.id !== id);
+    if (editingMarkId === id) editingMarkId = null;
+    save(); notify("Subject removed.");
+  }
 });
+COMPONENT_KEYS.forEach(key => {
+  $(key).addEventListener("input", updateTotalPreview);
+  $("max-" + key).addEventListener("input", updateTotalPreview);
+});
+updateTotalPreview();
 $("attendance-form").addEventListener("submit", event => {
   event.preventDefault();
   const subject=$("attendance-subject").value.trim(),present=Number($("attendance-present").value),total=Number($("attendance-total").value);
@@ -206,9 +268,16 @@ $("demo-button").addEventListener("click",()=>{
   };save();notify("Demo data loaded.");
 });
 $("export-button").addEventListener("click",()=>{
-  const lines=[["subject","semester","score","maximum","credits","percentage","grade_point"].join(",")];
+  const lines=[["subject","semester","credits","cie_theory","max_cie_theory","mid_sem","max_mid_sem","cie_practical","max_cie_practical","ese_theory","max_ese_theory","ese_practical","max_ese_practical","total_marks","max_marks","percentage","grade_point"].join(",")];
   const quote=(val)=>'"'+String(val).replace(/"/g,'""')+'"';
-  for (const m of state.marks)lines.push([quote(m.subject),m.semester,m.score,m.max,m.credits,fmt(scorePct(m),1),point(scorePct(m))].join(","));
+  for (const m of state.marks) {
+    const c = m.components || {};
+    const values = COMPONENT_KEYS.flatMap(key => {
+      const part = c[key] || (key === "ese-theory" && !m.components ? {score:m.score,max:m.max} : {score:0,max:0});
+      return [part.score,part.max];
+    });
+    lines.push([quote(m.subject),m.semester,m.credits,...values,m.score,m.max,fmt(scorePct(m),1),point(scorePct(m))].join(","));
+  }
   const file=new Blob([lines.join("\r\n")+"\r\n"],{type:"text/csv;charset=utf-8"});
   const url=URL.createObjectURL(file),a=document.createElement("a");a.href=url;a.download="edupredict_subject_marks.csv";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
   notify("Marks CSV downloaded.");
