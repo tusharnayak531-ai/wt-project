@@ -46,10 +46,15 @@
   <label class="full">Subject name<input id="subject-name" name="subject" placeholder="e.g. Data Structures" maxlength="80" required></label>
   <label>Semester<input type="number" id="subject-semester" min="1" max="12" value="5" required></label>
   <label>Credits<input type="number" id="subject-credits" min="1" max="12" value="4" required></label>
-  <label>Marks obtained<input type="number" id="subject-score" min="0" max="1000" value="78" required></label>
-  <label>Maximum marks<input type="number" id="subject-max" min="1" max="1000" value="100" required></label>
+  <div class="full"><h3>Manual exam marks</h3><p class="muted">Enter obtained and maximum marks for each component. Leave unused components at zero.</p></div>
+  <label>CIE Theory obtained<input type="number" id="cie-theory" min="0" max="1000" value="20" required></label><label>CIE Theory maximum<input type="number" id="max-cie-theory" min="0" max="1000" value="30" required></label>
+  <label>Mid-Sem obtained<input type="number" id="mid-sem" min="0" max="1000" value="15" required></label><label>Mid-Sem maximum<input type="number" id="max-mid-sem" min="0" max="1000" value="20" required></label>
+  <label>CIE Practical obtained<input type="number" id="cie-practical" min="0" max="1000" value="0" required></label><label>CIE Practical maximum<input type="number" id="max-cie-practical" min="0" max="1000" value="0" required></label>
+  <label>ESE Theory obtained<input type="number" id="ese-theory" min="0" max="1000" value="38" required></label><label>ESE Theory maximum<input type="number" id="max-ese-theory" min="0" max="1000" value="50" required></label>
+  <label>ESE Practical obtained<input type="number" id="ese-practical" min="0" max="1000" value="0" required></label><label>ESE Practical maximum<input type="number" id="max-ese-practical" min="0" max="1000" value="0" required></label>
+  <div class="full" id="manual-total-preview" aria-live="polite">Total: 73 / 100</div>
   <button class="primary full" type="submit">+ Save subject result</button>
- </form><p class="small-note">Existing result with the same subject and semester is updated. Demo grade points are computed from marks percentage.</p></article>
+ </form><p class="small-note">Existing result with the same subject and semester is updated. Marks are totaled automatically. Demo grade points are computed from marks percentage.</p></article>
  <article class="panel"><h3>Grading guide</h3><p class="muted">Illustrative percentage-to-grade-point conversion. Adjust to your institution's actual policy before relying on totals.</p>
  <div class="grade-legend"><span>90–100% <b>10 GP</b></span><span>80–89% <b>9 GP</b></span><span>70–79% <b>8 GP</b></span><span>60–69% <b>7 GP</b></span><span>50–59% <b>6 GP</b></span><span>40–49% <b>5 GP</b></span><span>Below 40% <b>0 GP</b></span></div></article></div>
  <article class="panel table-panel"><div class="panel-head"><h3>Saved subjects</h3><span id="record-count" class="tag">0 RECORDS</span></div><div class="table-scroll"><table><thead><tr><th>SUBJECT</th><th>SEM</th><th>MARKS</th><th>%</th><th>GP</th><th>CREDITS</th><th></th></tr></thead><tbody id="marks-table"></tbody></table></div><div class="empty hidden" id="marks-empty">No subject records yet. Add your first subject above.</div></article>
