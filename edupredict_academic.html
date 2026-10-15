@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#091326"><meta name="description" content="EduPredict academic intelligence and performance tracking workspace">
+<title>Academic Intelligence | EduPredict</title><link rel="stylesheet" href="/academic.css"><script defer src="/academic.js"></script></head>
+<body><div class="shell">
+<aside class="rail" aria-label="Academic navigation">
+ <a class="brand" href="/"><span class="brand-mark">E<span>·</span></span><span>EduPredict<small>ACADEMIC INTELLIGENCE</small></span></a>
+ <div class="nav-caption">YOUR WORKSPACE</div>
+ <nav class="nav" id="navigation">
+  <button class="nav-item active" data-page="overview" type="button"><span>◈</span> Overview</button>
+  <button class="nav-item" data-page="marks" type="button"><span>▤</span> Marks Entry</button>
+  <button class="nav-item" data-page="grades" type="button"><span>∑</span> SGPA &amp; CGPA</button>
+  <button class="nav-item" data-page="attendance" type="button"><span>◷</span> Attendance</button>
+  <button class="nav-item" data-page="assignments" type="button"><span>☑</span> Assignments</button>
+  <button class="nav-item" data-page="goals" type="button"><span>◎</span> Goals &amp; Planner</button>
+ </nav><div class="rail-footer">
+  <a href="/" class="rail-link">↗ AI Prediction Studio</a>
+  <a href="/logout" class="rail-link">↪ Sign out</a>
+  <p>Personal demo workspace. Data saves in this browser only.</p>
+ </div>
+</aside>
+<main class="main"><header class="topbar"><span>IU / <b>ACADEMIC INTELLIGENCE</b> / STUDENT WORKSPACE</span><div><span class="live-dot"></span> ACCOUNT PROTECTED</div></header>
+<div class="container">
+<section class="hero"><div class="eyebrow">✦ ACADEMIC PERFORMANCE ANALYZER</div><h1>Your academic progress,<br><em>beautifully in focus.</em></h1>
+<p>Track marks, calculate SGPA and CGPA, manage attendance and assignments, and turn goals into an action plan.</p>
+<div class="hero-actions"><button class="primary" data-jump="marks" type="button">+ Add your marks</button><a class="ghost" href="/">Try AI performance prediction ↗</a></div><div class="hero-decoration" aria-hidden="true"></div></section>
+<div class="notice" role="note"><strong>Demo grading:</strong> Grade-point thresholds are illustrative, not an official university policy. Records stay in this browser; they are not synced between devices.</div>
+<section data-screen="overview" class="screen">
+ <div class="section-title"><div><span class="eyebrow">01 / YOUR AT-A-GLANCE VIEW</span><h2>Academic dashboard</h2><p>One place for your most important academic numbers.</p></div><button class="outline" type="button" id="demo-button">Load demo data</button></div>
+ <div class="metric-grid">
+  <article class="metric"><span>ESTIMATED CGPA</span><strong id="overview-cgpa">—</strong><small>Credit-weighted across all entered semesters</small></article>
+  <article class="metric"><span>CURRENT SGPA</span><strong id="overview-sgpa">—</strong><small id="semester-label">Most recent semester</small></article>
+  <article class="metric"><span>ATTENDANCE</span><strong id="overview-attendance">—</strong><small>Weighted by attended and total classes</small></article>
+  <article class="metric"><span>ASSIGNMENTS</span><strong id="overview-assignments">0/0</strong><small>Completed / total</small></article>
+ </div>
+ <div class="columns">
+  <article class="panel"><div class="panel-head"><div><h3>Subject performance</h3><p>Your latest semester's marks by subject</p></div><span class="tag">LIVE TRACKING</span></div><div id="overview-subjects" class="chart-list"></div></article>
+  <article class="panel"><div class="panel-head"><div><h3>Next best steps</h3><p>Suggestions from your entered information</p></div></div><div id="overview-insights" class="insight-list"></div><button class="text-button" data-jump="goals" type="button">Go to academic goals →</button></article>
+ </div>
+ <div class="bottom-banner"><div><span class="eyebrow">AI-POWERED CLASSIFICATION</span><h3>Want a performance prediction?</h3><p>Use the original ML model to estimate Low, Medium or High from attendance category and class engagement.</p></div><a href="/">Open Prediction Studio ↗</a></div>
+</section>
+<section data-screen="marks" class="screen hidden">
+ <div class="section-title"><div><span class="eyebrow">02 / ACADEMIC RECORDS</span><h2>Marks entry</h2><p>Add your subject marks to power your personal academic dashboard.</p></div><button class="outline" type="button" id="export-button">↓ Export CSV</button></div>
+ <div class="columns wide-left"><article class="panel"><h3>Add a subject result</h3>
+ <form id="marks-form" class="input-grid">
+  <label class="full">Subject name<input id="subject-name" name="subject" placeholder="e.g. Data Structures" maxlength="80" required></label>
+  <label>Semester<input type="number" id="subject-semester" min="1" max="12" value="5" required></label>
+  <label>Credits<input type="number" id="subject-credits" min="1" max="12" value="4" required></label>
+  <label>Marks obtained<input type="number" id="subject-score" min="0" max="1000" value="78" required></label>
+  <label>Maximum marks<input type="number" id="subject-max" min="1" max="1000" value="100" required></label>
+  <button class="primary full" type="submit">+ Save subject result</button>
+ </form><p class="small-note">Existing result with the same subject and semester is updated. Demo grade points are computed from marks percentage.</p></article>
+ <article class="panel"><h3>Grading guide</h3><p class="muted">Illustrative percentage-to-grade-point conversion. Adjust to your institution's actual policy before relying on totals.</p>
+ <div class="grade-legend"><span>90–100% <b>10 GP</b></span><span>80–89% <b>9 GP</b></span><span>70–79% <b>8 GP</b></span><span>60–69% <b>7 GP</b></span><span>50–59% <b>6 GP</b></span><span>40–49% <b>5 GP</b></span><span>Below 40% <b>0 GP</b></span></div></article></div>
+ <article class="panel table-panel"><div class="panel-head"><h3>Saved subjects</h3><span id="record-count" class="tag">0 RECORDS</span></div><div class="table-scroll"><table><thead><tr><th>SUBJECT</th><th>SEM</th><th>MARKS</th><th>%</th><th>GP</th><th>CREDITS</th><th></th></tr></thead><tbody id="marks-table"></tbody></table></div><div class="empty hidden" id="marks-empty">No subject records yet. Add your first subject above.</div></article>
+</section>
+<section data-screen="grades" class="screen hidden">
+ <div class="section-title"><div><span class="eyebrow">03 / GRADE CALCULATOR</span><h2>SGPA &amp; CGPA</h2><p>Understand how each subject's credits affect your academic averages.</p></div></div>
+ <div class="metric-grid three">
+  <article class="metric"><span>OVERALL CGPA</span><strong id="grade-cgpa">—</strong><small>All entered semesters</small></article>
+  <article class="metric"><span>SELECTED SGPA</span><strong id="grade-sgpa">—</strong><small>Credit-weighted semester average</small></article>
+  <article class="metric"><span>TOTAL CREDITS</span><strong id="grade-credits">0</strong><small>Saved academic results</small></article>
+ </div>
+ <article class="panel"><div class="panel-head"><div><h3>Semester-wise performance</h3><p>Estimated SGPA trend</p></div><label class="inline-select">Focus semester <select id="focus-semester"><option value="all">All</option></select></label></div><div id="semester-chart" class="semester-bars"></div><p class="small-note">SGPA = Σ(grade point × subject credits) ÷ Σ(subject credits). CGPA uses the same formula across all semesters.</p></article>
+</section>
+<section data-screen="attendance" class="screen hidden">
+ <div class="section-title"><div><span class="eyebrow">04 / CLASS PRESENCE</span><h2>Attendance tracker</h2><p>Watch attendance and spot subjects needing attention.</p></div></div>
+ <div class="columns wide-left"><article class="panel"><h3>Record subject attendance</h3><form class="input-grid" id="attendance-form">
+  <label class="full">Subject<input id="attendance-subject" placeholder="e.g. Database Systems" maxlength="80" required></label>
+  <label>Classes attended<input type="number" id="attendance-present" min="0" max="10000" value="35" required></label>
+  <label>Total classes<input type="number" id="attendance-total" min="1" max="10000" value="45" required></label>
+  <button class="primary full" type="submit">Save attendance</button></form></article>
+ <article class="panel"><h3>Overall attendance</h3><div class="big-figure" id="attendance-total-value">—</div><div class="progress"><i id="attendance-progress"></i></div><p class="muted">Your institution may have its own attendance requirement. This tracker only reports entered data.</p></article></div>
+ <article class="panel"><h3>Attendance by subject</h3><div class="table-scroll"><table><thead><tr><th>SUBJECT</th><th>ATTENDED</th><th>TOTAL</th><th>PERCENTAGE</th><th></th></tr></thead><tbody id="attendance-table"></tbody></table></div><div id="attendance-empty" class="empty hidden">No attendance added yet.</div></article>
+</section>
+<section data-screen="assignments" class="screen hidden">
+ <div class="section-title"><div><span class="eyebrow">05 / TASKS</span><h2>Assignment tracker</h2><p>Manage coursework and keep your submission list organized.</p></div></div>
+ <article class="panel"><h3>Add an assignment</h3><form id="assignment-form" class="input-grid assign-grid">
+  <label>Assignment title<input id="assignment-title" maxlength="100" placeholder="e.g. DAA Lab 4" required></label>
+  <label>Subject<input id="assignment-subject" maxlength="80" placeholder="e.g. Algorithms" required></label>
+  <label>Due date<input type="date" id="assignment-due" required></label>
+  <button type="submit" class="primary">+ Add assignment</button></form></article>
+ <article class="panel table-panel"><div class="panel-head"><h3>My assignments</h3><span id="assignment-progress" class="tag">0 COMPLETE</span></div><div id="assignment-list" class="task-list"></div><div id="assignment-empty" class="empty hidden">Your assignment list is empty.</div></article>
+</section>
+<section data-screen="goals" class="screen hidden">
+ <div class="section-title"><div><span class="eyebrow">06 / PERSONAL PLANNER</span><h2>Goals &amp; target planner</h2><p>Set an SGPA target and see how far your current results are from it.</p></div></div>
+ <div class="columns"><article class="panel"><h3>Set your target</h3>
+ <form class="input-grid" id="goal-form"><label class="full">Target SGPA (0 to 10)<input id="goal-target" type="number" step="0.1" min="0" max="10" value="9" required></label>
+ <button type="submit" class="primary full">Save academic goal</button></form><div id="goal-summary" class="goal-summary"></div></article>
+ <article class="panel"><h3>Planning insights</h3><div id="goal-advice" class="insight-list"></div><p class="small-note">The planner describes the difference from current SGPA; it does not predict future examination marks or guarantee a grade.</p></article></div>
+</section>
+<footer>EduPredict · Academic Intelligence Workspace <span>Academic mini-project · Saved locally on your device</span></footer>
+</div></main></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div></body></html>
