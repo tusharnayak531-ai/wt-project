@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FashionAI · Discover Your Style</title>
+<link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}"></head>
+<body>
+<header class="top"><a class="brand" href="/">FASHION<span>AI</span></a><div class="top-note">AI-ASSISTED STYLE DISCOVERY</div><span class="top-pill">24 curated styles</span></header>
+<main>
+<section class="hero"><p class="eyebrow">THE SMARTER WAY TO FIND YOUR LOOK</p><h1>Style starts with <i>inspiration.</i></h1>
+<p class="lead">Describe a piece you love, upload a clothing photo, or try both. Find relevant styles from our fashion collection.</p><div class="hero-line"></div></section>
+<section class="search"><form id="searchForm"><div class="input-head"><label for="description">WHAT ARE YOU LOOKING FOR?</label><span>STEP 01 / SEARCH</span></div>
+<input id="description" name="description" type="text" placeholder="e.g. black casual t-shirt for men" autocomplete="off">
+<div class="upload"><label for="image">Upload your fashion inspiration <small>JPEG / PNG / WEBP · max 5 MB</small></label>
+<input type="file" id="image" name="image" accept="image/png,image/jpeg,image/webp">
+<div class="filename" id="filename">No file selected</div></div>
+<div class="search-footer"><span>Try <a href="#" data-preset="summer dress">summer dress</a> · <a href="#" data-preset="blue denim jacket">blue denim jacket</a></span>
+<button id="submit" type="submit">Find my styles <b>↗</b></button></div></form></section>
+<section class="collection"><div class="section-head"><div><p class="eyebrow">CURATED FOR YOU</p><h2>Explore the collection</h2></div><div id="status">All {{ count }} styles</div></div><div id="grid" class="grid"></div></section>
+</main>
+<footer>FASHIONAI / Academic project demo <span>Product images are synthetic illustrations · Similarity uses text vectors and visual colour.</span></footer>
+<script src="{{ url_for('static',filename='app.js') }}"></script>
+</body></html>

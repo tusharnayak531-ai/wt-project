@@ -1,0 +1,25 @@
+id,name,description,category,color,gender,style,image
+1,Classic Crew T-Shirt,"black t-shirt for men, casual outfit, comfortable fashionable clothing",t-shirt,black,men,casual,/item/1.svg
+2,Everyday Cotton Tee,"white t-shirt for women, casual outfit, comfortable fashionable clothing",t-shirt,white,women,casual,/item/2.svg
+3,Relaxed Graphic Tee,"red t-shirt for unisex, streetwear outfit, comfortable fashionable clothing",t-shirt,red,unisex,streetwear,/item/3.svg
+4,Essential Polo Shirt,"blue polo for men, smart casual outfit, comfortable fashionable clothing",polo,blue,men,smart casual,/item/4.svg
+5,Summer Linen Shirt,"beige shirt for men, summer outfit, comfortable fashionable clothing",shirt,beige,men,summer,/item/5.svg
+6,Formal Button Shirt,"white shirt for men, formal outfit, comfortable fashionable clothing",shirt,white,men,formal,/item/6.svg
+7,Denim Overshirt,"navy shirt for women, casual outfit, comfortable fashionable clothing",shirt,navy,women,casual,/item/7.svg
+8,Flowy Midi Dress,"pink dress for women, summer outfit, comfortable fashionable clothing",dress,pink,women,summer,/item/8.svg
+9,Evening Wrap Dress,"black dress for women, party outfit, comfortable fashionable clothing",dress,black,women,party,/item/9.svg
+10,Floral Summer Dress,"yellow dress for women, summer outfit, comfortable fashionable clothing",dress,yellow,women,summer,/item/10.svg
+11,Everyday Hoodie,"gray hoodie for unisex, streetwear outfit, comfortable fashionable clothing",hoodie,gray,unisex,streetwear,/item/11.svg
+12,Oversized Hoodie,"green hoodie for unisex, casual outfit, comfortable fashionable clothing",hoodie,green,unisex,casual,/item/12.svg
+13,Zip Up Sweatshirt,"navy hoodie for men, sport outfit, comfortable fashionable clothing",hoodie,navy,men,sport,/item/13.svg
+14,Straight Leg Jeans,"blue jeans for women, casual outfit, comfortable fashionable clothing",jeans,blue,women,casual,/item/14.svg
+15,Classic Denim Jeans,"navy jeans for men, casual outfit, comfortable fashionable clothing",jeans,navy,men,casual,/item/15.svg
+16,Wide Leg Trousers,"beige trousers for women, formal outfit, comfortable fashionable clothing",trousers,beige,women,formal,/item/16.svg
+17,Tailored Office Pants,"black trousers for men, formal outfit, comfortable fashionable clothing",trousers,black,men,formal,/item/17.svg
+18,Athletic Joggers,"gray joggers for unisex, sport outfit, comfortable fashionable clothing",joggers,gray,unisex,sport,/item/18.svg
+19,Lightweight Bomber,"brown jacket for men, streetwear outfit, comfortable fashionable clothing",jacket,brown,men,streetwear,/item/19.svg
+20,Classic Denim Jacket,"blue jacket for women, casual outfit, comfortable fashionable clothing",jacket,blue,women,casual,/item/20.svg
+21,Winter Puffer Jacket,"black jacket for unisex, winter outfit, comfortable fashionable clothing",jacket,black,unisex,winter,/item/21.svg
+22,Knit Pullover Sweater,"green sweater for women, winter outfit, comfortable fashionable clothing",sweater,green,women,winter,/item/22.svg
+23,Soft Wool Cardigan,"pink sweater for women, winter outfit, comfortable fashionable clothing",sweater,pink,women,winter,/item/23.svg
+24,Striped Knit Sweater,"red sweater for men, winter outfit, comfortable fashionable clothing",sweater,red,men,winter,/item/24.svg
